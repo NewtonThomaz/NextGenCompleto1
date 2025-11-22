@@ -1,21 +1,13 @@
 package br.com.nextgen.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,9 +27,9 @@ public class Cultura {
     @Column(nullable = false)
     private String nome;
 
-    @NotNull(message = "A data é obrigatória")
-    @Column(nullable = false)
-    private LocalDate data;
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 
     @ManyToMany(mappedBy = "culturas")
     @ToString.Exclude

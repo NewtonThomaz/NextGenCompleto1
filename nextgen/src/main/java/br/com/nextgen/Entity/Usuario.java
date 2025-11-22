@@ -48,9 +48,6 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private String senha;
 
-    @Column(nullable = false)
-    private Boolean ativo = true;
-
     // --- Métodos do UserDetails ---
 
     @Override
@@ -78,6 +75,4 @@ public class Usuario implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() { return true; }
 
-    @Override
-    public boolean isEnabled() { return ativo; }
 }

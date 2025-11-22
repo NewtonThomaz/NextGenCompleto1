@@ -76,7 +76,6 @@ public class UsuarioController {
         usuario.setEmail(usuarioDTO.email());
         usuario.setSenha(usuarioDTO.senha()); // A criptografia ocorre no Service
         usuario.setFotoPerfil(usuarioDTO.fotoPerfil());
-        usuario.setAtivo(true);
 
         Usuario novoUsuario = usuarioService.salvar(usuario);
         return ResponseEntity.status(HttpStatus.CREATED).body(new UsuarioResponseDTO(novoUsuario));

@@ -1,17 +1,6 @@
 package br.com.nextgen.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -58,6 +47,21 @@ public class Talhao {
     @Column(name = "medida", nullable = false)
     private Medida medida;
 
+    @OneToMany(mappedBy = "talhao")
+    @ToString.Exclude            // <--- AQUI
+    @EqualsAndHashCode.Exclude   // <--- AQUI
+    private List<LeituraTemperatura> leiturasTemperatura;
+
+    @OneToMany(mappedBy = "talhao")
+    @ToString.Exclude            // <--- AQUI
+    @EqualsAndHashCode.Exclude   // <--- AQUI
+    private List<LeituraUmidade> leiturasUmidade;
+
+    @OneToMany(mappedBy = "talhao")
+    @ToString.Exclude            // <--- AQUI
+    @EqualsAndHashCode.Exclude   // <--- AQUI
+    private List<Colaborador> colaboradores;
+
     @ManyToMany
     @JoinTable(
             name = "Talhao_Cultura",
@@ -77,16 +81,6 @@ public class Talhao {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Operacao> operacoes;
-
-    @ManyToMany
-    @JoinTable(
-            name = "Talhao_Colaborador",
-            joinColumns = @JoinColumn(name = "id_talhao"),
-            inverseJoinColumns = @JoinColumn(name = "id_colaborador")
-    )
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Colaborador> colaboradores;
 
     @Column(nullable = false)
     private Boolean ativo = true;

@@ -9,9 +9,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -19,8 +18,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Leitura_Umidade")
-public class LeituraUmidade {
+@Table(name = "Leitura_Temperatura")
+public class LeituraTemperatura {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -29,11 +28,11 @@ public class LeituraUmidade {
     @NotNull(message = "O sensor é obrigatório")
     @ManyToOne
     @JoinColumn(name = "id_sensor", nullable = false)
-    private SensorUmidade sensor;
+    private SensorTemperatura sensor;
 
-    @NotNull(message = "A umidade é obrigatória")
+    @NotNull(message = "A temperatura é obrigatória")
     @Column(nullable = false)
-    private Double umidade;
+    private Double temperatura;
 
     @NotNull(message = "A data e hora são obrigatórias")
     @Column(name = "data_hora", nullable = false)
@@ -41,5 +40,7 @@ public class LeituraUmidade {
 
     @ManyToOne
     @JoinColumn(name = "id_talhao")
+    @ToString.Exclude          // <--- RECOMENDADO
+    @EqualsAndHashCode.Exclude // <--- RECOMENDADO
     private Talhao talhao;
 }

@@ -41,8 +41,11 @@ public class Colaborador {
     @Column(name = "permissao", nullable = false)
     private Permissao permissao;
 
-    @ManyToMany(mappedBy = "colaboradores")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<Talhao> talhoes;
+    @ManyToOne
+    @JoinColumn(name = "id_talhao", nullable = false)
+    private Talhao talhao;
+//    @ManyToMany(mappedBy = "colaboradores")
+//    @ToString.Exclude
+//    @EqualsAndHashCode.Exclude
+//    private List<Talhao> talhoes;
 }
