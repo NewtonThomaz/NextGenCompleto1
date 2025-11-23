@@ -1,41 +1,67 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, Plus, Eye, Trash2, Save } from 'lucide-react';
+// Importação dos componentes do gráfico
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function TalhaoDetail() {
+  // 1. Estados alterados para TRUE para que os gráficos apareçam primeiro
+  const [showTempGraph, setShowTempGraph] = useState(true);
+  const [showHumidityGraph, setShowHumidityGraph] = useState(true);
+
+  // 2. Dados do gráfico de Temperatura
+  const tempGraphic = [
+    { dia: '12', temperatura: 25 },
+    { dia: '13', temperatura: 22 },
+    { dia: '14', temperatura: 28 },
+    { dia: '15', temperatura: 26 },
+    { dia: '16', temperatura: 30 },
+    { dia: '17', temperatura: 24 },
+    { dia: '18', temperatura: 27 },
+  ];
+
+  // 3. Dados do gráfico de Umidade
+  const humidityGraphic = [
+    { dia: '12', umidade: 60 },
+    { dia: '13', umidade: 55 },
+    { dia: '14', umidade: 65 },
+    { dia: '15', umidade: 62 },
+    { dia: '16', umidade: 70 },
+    { dia: '17', umidade: 58 },
+    { dia: '18', umidade: 63 },
+  ];
+
   const fullHistory = [
-    { id: '1', name: 'Soja', year: '2025' },
-    // { id: '2', name: 'Trigo', year: '2023' },
-    // { id: '3', name: 'Milho', year: '2022' },
+    { id: '1', name: 'Soja' },
+    { id: '2', name: 'Trigo' },
+    { id: '3', name: 'Milho' },
   ];
 
   const currentCulture = fullHistory.length > 0 ? fullHistory[0] : null;
 
-  const previousCultures = currentCulture 
+  const previousCultures = currentCulture
     ? fullHistory.filter(item => item.id !== currentCulture.id)
     : [];
 
   return (
-    // AJUSTE AQUI: Substituído min-h-screen por min-h-[calc(100vh-5rem)]
-    // Isso desconta a altura média de um header (5rem = 80px) para evitar rolagem dupla/estouro
     <main className="min-h-[calc(100vh-5rem)] bg-gray-50 flex justify-center py-8 px-4 font-sans">
       <section className="w-full max-w-lg md:max-w-5xl space-y-5">
-        
+
         <header className="flex items-center py-2">
-          <a href='/home' 
+          <button
             aria-label="Voltar"
             className="text-[#556B2F] hover:bg-gray-100 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#556B2F] focus:ring-offset-2"
           >
             <ArrowLeft size={32} strokeWidth={2.5} />
-          </a>
+          </button>
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-6" aria-label="Layout de Colunas">
-          
+
           {/* Coluna da Esquerda */}
           <section className="space-y-5" aria-label="Informações Principais">
-            
+
             {/* Nome do Talhão - Input */}
             <section className="bg-white rounded-2xl shadow-md p-5">
               <label htmlFor="nome-talhao" className="text-sm font-bold text-gray-800 mb-1 block">
@@ -64,7 +90,7 @@ export default function TalhaoDetail() {
 
             {/* Estatísticas */}
             <section className="grid grid-cols-3 gap-3" aria-label="Estatísticas do Talhão">
-              
+
               {/* Hectares - Input */}
               <article className="bg-white rounded-2xl shadow-md p-3 flex flex-col items-center justify-between aspect-square">
                 <label htmlFor="hectares" className="text-xs font-bold text-gray-800 mt-1">
@@ -99,7 +125,7 @@ export default function TalhaoDetail() {
 
           {/* Coluna da Direita */}
           <section className="space-y-5" aria-label="Histórico e Sensores">
-            
+
             {previousCultures && previousCultures.length > 0 && (
               <section className="bg-white rounded-2xl shadow-md p-5">
                 <h2 className="text-xs font-bold text-gray-800 mb-4">Culturas Anteriores</h2>
@@ -108,11 +134,8 @@ export default function TalhaoDetail() {
                     <React.Fragment key={culture.id}>
                       <li className="text-center">
                         <h3 className="text-2xl font-bold text-[#556B2F]">{culture.name}</h3>
-                        <time className="text-xs font-semibold text-gray-700" dateTime={culture.year}>
-                          ({culture.year})
-                        </time>
                       </li>
-                      
+
                       {index < previousCultures.length - 1 && (
                         <li aria-hidden="true" className="w-px h-10 bg-gray-200"></li>
                       )}
@@ -131,49 +154,176 @@ export default function TalhaoDetail() {
               </span>
             </button>
 
-            <form className="bg-white rounded-2xl shadow-md p-5 space-y-4" onSubmit={(e) => e.preventDefault()}>
-              <h2 className="text-lg font-bold text-black">Sensores</h2>
+            <h2 className="text-lg font-bold text-black">Sensores</h2>
 
-              <fieldset className="space-y-1 border-none m-0 p-0">
-                <label htmlFor="temp-sensor" className="text-[#556B2F] text-sm font-bold block">
-                  Temperatura
-                </label>
-                <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#556B2F] focus-within:border-transparent">
-                  <input 
-                    id="temp-sensor"
-                    type="text" 
-                    defaultValue="192.168.0.1" 
-                    className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent"
-                  />
-                  <button type="button" className="bg-[#7FA050] text-white px-6 font-medium hover:bg-[#6d8a44] transition-colors h-full">
-                    Editar
-                  </button>
-                </span>
-              </fieldset>
+            {/* SEÇÃO TEMPERATURA */}
+            <section className="bg-white rounded-2xl shadow-md p-5 space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <fieldset className="space-y-2 border-none m-0 p-0">
+                
+                {/* Header com Label e Toggle Switch */}
+                <div className="flex justify-between items-center">
+                  <label htmlFor="temp-sensor" className="text-[#556B2F] text-sm font-bold block">
+                    Temperatura
+                  </label>
 
-              <fieldset className="space-y-1 border-none m-0 p-0">
-                <label htmlFor="humidity-sensor" className="text-[#556B2F] text-sm font-bold block">
-                  Umidade
-                </label>
-                <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#556B2F] focus-within:border-transparent">
-                  <input 
-                    id="humidity-sensor"
-                    type="text" 
-                    defaultValue="192.168.1.1" 
-                    className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent"
-                  />
-                  <button type="button" className="bg-[#7FA050] text-white px-6 font-medium hover:bg-[#6d8a44] transition-colors h-full">
-                    Editar
-                  </button>
-                </span>
+                  {/* Wrapper para Texto de Aviso + Toggle */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold text-gray-400">Ver Gráfico</span>
+                    
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={showTempGraph} 
+                        onChange={() => setShowTempGraph(!showTempGraph)} 
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7FA050]"></div>
+                      <span className="ml-2 text-xs font-medium text-gray-400 select-none">
+                        {showTempGraph ? 'ON' : 'OFF'}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Input Original - Oculto se o gráfico estiver ON */}
+                {!showTempGraph && (
+                  <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#556B2F] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
+                    <span
+                      className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent flex items-center "
+                      id="temp-sensor"
+                    >
+                      192.168.0.1
+                    </span>
+                    <button type="button" className="bg-[#7FA050] text-white px-6 font-medium hover:bg-[#6d8a44] transition-colors h-full">
+                      Editar
+                    </button>
+                  </span>
+                )}
+
+                {/* Gráfico Condicional Temperatura - Visível por padrão */}
+                {showTempGraph && (
+                  <div className="mt-4 h-48 w-full bg-gray-50 rounded-lg p-2 border border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={tempGraphic}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis 
+                          dataKey="dia" 
+                          tick={{ fontSize: 12, fill: '#6b7280' }} 
+                          axisLine={false} 
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12, fill: '#6b7280' }} 
+                          axisLine={false} 
+                          tickLine={false}
+                          domain={['dataMin - 2', 'dataMax + 2']} 
+                        />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="temperatura" 
+                          stroke="#556B2F" 
+                          strokeWidth={3} 
+                          dot={{ r: 4, fill: '#556B2F', strokeWidth: 0 }}
+                          activeDot={{ r: 6, fill: '#7FA050' }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
               </fieldset>
-            </form>
+            </section>
+            
+            {/* SEÇÃO UMIDADE */}
+            <section className="bg-white rounded-2xl shadow-md p-5 space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <fieldset className="space-y-2 border-none m-0 p-0">
+                
+                {/* Header com Label e Toggle Switch */}
+                <div className="flex justify-between items-center">
+                  <label htmlFor="humidity-sensor" className="text-[#556B2F] text-sm font-bold block">
+                    Umidade
+                  </label>
+
+                  {/* Wrapper para Texto de Aviso + Toggle */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-bold text-gray-400">Ver Gráfico</span>
+
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={showHumidityGraph} 
+                        onChange={() => setShowHumidityGraph(!showHumidityGraph)} 
+                        className="sr-only peer" 
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7FA050]"></div>
+                      <span className="ml-2 text-xs font-medium text-gray-400 select-none">
+                        {showHumidityGraph ? 'ON' : 'OFF'}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                 {/* Input Umidade - Oculto se o gráfico estiver ON */}
+                {!showHumidityGraph && (
+                  <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#556B2F] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
+                    <span
+                      className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent flex items-center "
+                      id="humidity-sensor"
+                    >
+                      192.168.0.1
+                    </span>
+
+                    <button type="button" className="bg-[#7FA050] text-white px-6 font-medium hover:bg-[#6d8a44] transition-colors h-full">
+                      Editar
+                    </button>
+                  </span>
+                )}
+
+                {/* Gráfico Condicional Umidade - Visível por padrão */}
+                {showHumidityGraph && (
+                  <div className="mt-4 h-48 w-full bg-gray-50 rounded-lg p-2 border border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={humidityGraphic}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                        <XAxis 
+                          dataKey="dia" 
+                          tick={{ fontSize: 12, fill: '#6b7280' }} 
+                          axisLine={false} 
+                          tickLine={false}
+                        />
+                        <YAxis 
+                          tick={{ fontSize: 12, fill: '#6b7280' }} 
+                          axisLine={false} 
+                          tickLine={false}
+                          domain={[0, 100]} // Umidade geralmente é 0-100%
+                        />
+                        <Tooltip 
+                          contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                          labelStyle={{ color: '#374151', fontWeight: 'bold' }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="umidade" 
+                          stroke="#556B2F" 
+                          strokeWidth={3} 
+                          dot={{ r: 4, fill: '#556B2F', strokeWidth: 0 }}
+                          activeDot={{ r: 6, fill: '#7FA050' }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </fieldset>
+            </section>
 
             <footer className="pt-4 pb-8 flex flex-col sm:flex-row gap-3 md:justify-end">
               <button className="flex items-center justify-center gap-2 px-8 py-3 rounded-2xl bg-[#7FA050] text-white font-bold text-lg hover:bg-[#6d8a44] active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#556B2F] focus:ring-offset-2 w-full md:w-auto shadow-md">
                 Salvar <Save size={24} aria-hidden="true" />
               </button>
-              
+
               <button className="flex items-center justify-center gap-2 px-8 py-3 rounded-2xl border-2 border-red-500 text-red-500 font-bold text-lg hover:bg-red-50 active:bg-red-100 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 w-full md:w-auto">
                 Excluir <Trash2 size={24} aria-hidden="true" />
               </button>
@@ -182,6 +332,6 @@ export default function TalhaoDetail() {
 
         </section>
       </section>
-    </main>
+    </main >
   );
 }

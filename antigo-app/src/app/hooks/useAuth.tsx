@@ -54,7 +54,7 @@ export function useAuth() {
       if (err.response && err.response.status === 401) {
         setError('Email ou senha incorretos.');
       } else {
-        setError('Erro ao conectar com o servidor.');
+        setError('Erro ao conectar com o servidor. Senha ou Email invalido');
       }
     } finally {
       setLoading(false);
@@ -66,14 +66,14 @@ export function useAuth() {
     setError(null);
     try {
       await authService.register(userData);
-      alert('Conta criada com sucesso! Faça login para continuar.');
+      // alert('Conta criada com sucesso! Faça login para continuar.');
       router.push('/'); 
     } catch (err: any) {
       console.error(err);
       if (err.response && err.response.status === 400) {
         setError('Dados inválidos ou email já cadastrado.');
       } else {
-        setError('Erro ao criar conta.');
+        setError('Erro ao criar conta. Email ja registrado');
       }
     } finally {
       setLoading(false);
