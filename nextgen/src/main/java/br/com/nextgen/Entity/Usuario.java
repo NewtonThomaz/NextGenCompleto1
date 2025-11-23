@@ -28,7 +28,7 @@ public class Usuario implements UserDetails {
     private UUID id;
 
     @Column(name = "foto_perfil")
-    @Size(max = 255, message = "A URL da foto de perfil não pode exceder 255 caracteres")
+    @Size(max = 500, message = "A URL da foto de perfil não pode exceder 500 caracteres")
     private String fotoPerfil;
 
     @NotBlank(message = "O nome é obrigatório")

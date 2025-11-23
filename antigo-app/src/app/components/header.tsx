@@ -15,8 +15,8 @@ export default function Header() {
 
     const navLinks = [
         { name: 'Início', icon: <Home className="w-5 h-5" />, href: '/home' },
-        { name: 'Configurações', icon: <Settings className="w-5 h-5" />, href: '/configuracoes' },
         { name: 'Perfil', icon: <User className="w-5 h-5" />, href: '/perfil' },
+        { name: 'Configurações', icon: <Settings className="w-5 h-5" />, href: '/configuracoes' },
     ];
 
     return (

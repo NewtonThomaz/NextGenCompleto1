@@ -1,9 +1,6 @@
-// Se você já tem um arquivo src/types/talhao.ts, pode migrar tudo para cá ou unificar.
-
 export enum Permissao {
     ROOT = 'ROOT',
     ADMIN = 'ADMIN',
-    DEFAULT = 'DEFAULT',
     VIEW = 'VIEW'
 }
 

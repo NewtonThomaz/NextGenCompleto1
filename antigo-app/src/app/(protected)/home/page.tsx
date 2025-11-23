@@ -8,6 +8,7 @@ import 'swiper/css';
 import 'swiper/css/autoplay';
 import { Plus, ArrowLeft, Loader2, ChevronDown } from 'lucide-react';
 
+// Ajuste os caminhos conforme sua estrutura de pastas
 import { carrossel } from "../../model/data/carrossel";
 import { useAuth } from '../../hooks/useAuth';
 import { useTalhoes } from '../../hooks/useTalhoes';
@@ -36,18 +37,18 @@ export default function Home() {
 
     const areaTotalEmHectares = useMemo(() => {
         return meusTalhoes.reduce((acc, talhao) => {
-            let valorEmHectares = talhao.tamanho;
+            let valorEmHectares = Number(talhao.tamanho);
 
             switch (talhao.medida) {
                 case Medida.METROS_QUADRADOS:
-                    valorEmHectares = talhao.tamanho / 10000;
+                    valorEmHectares = Number(talhao.tamanho) / 10000;
                     break;
                 case Medida.QUILOMETROS_QUADRADOS:
-                    valorEmHectares = talhao.tamanho * 100;
+                    valorEmHectares = Number(talhao.tamanho) * 100;
                     break;
                 case Medida.HECTARE:
                 default:
-                    valorEmHectares = talhao.tamanho;
+                    valorEmHectares = Number(talhao.tamanho);
                     break;
             }
 
@@ -107,7 +108,9 @@ export default function Home() {
     };
 
     return (
-        <main className="min-h-screen bg-white pb-12">
+        // AJUSTE 1: Removido 'min-h-screen'. Usamos w-full e h-full para respeitar o layout pai.
+        // Adicionado 'overflow-y-auto' caso este container precise scrollar internamente.
+        <main className="w-full h-full bg-white pb-12 overflow-x-hidden">
 
             <header className="p-6 pb-2">
                 <h1 className="text-2xl text-black">
@@ -131,6 +134,7 @@ export default function Home() {
                 >
                     {carrossel.map((item, index) => (
                         <SwiperSlide key={index} className="rounded-2xl shadow-lg overflow-hidden h-56">
+                            {/* Dica: Considere usar o componente <Image /> do Next.js futuramente */}
                             <img className="w-full h-full object-cover" src={item.src} alt={item.alt} />
                         </SwiperSlide>
                     ))}
@@ -139,7 +143,8 @@ export default function Home() {
 
             <section className={`transition-all duration-300 ${isModalOpen ? 'blur-sm brightness-50 pointer-events-none' : ''}`}>
 
-                <section className="flex justify-center items-center gap-4 px-6 mt-4 mb-8 text-center w-[100dvw]">
+                {/* AJUSTE 2: Mudado de w-[100dvw] para w-full. 100dvw ignora scrollbars verticais e causa rolagem horizontal. */}
+                <section className="flex justify-center items-center gap-4 px-6 mt-4 mb-8 text-center w-full">
 
                     <article className="flex-1 border-r border-gray-200 last:border-0">
                         <h3 className="text-sm text-gray-600 mb-1">Talhões</h3>
@@ -214,7 +219,7 @@ export default function Home() {
             </section>
 
             {isModalOpen && (
-                <dialog className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-transparent p-4 md:p-0">
+                <dialog className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-black/50 p-4 md:p-0 backdrop-blur-sm">
                     <form
                         className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 border-2 border-gray-100 animate-in fade-in zoom-in duration-200"
                         onSubmit={handleSubmit}
