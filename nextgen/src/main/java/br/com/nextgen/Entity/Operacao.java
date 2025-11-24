@@ -1,12 +1,6 @@
 package br.com.nextgen.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -44,8 +38,9 @@ public class Operacao {
     @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataHora;
 
-    @ManyToMany(mappedBy = "operacoes")
+    @ManyToOne
+    @JoinColumn(name = "id_talhao", nullable = false)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    private List<Talhao> talhoes;
+    private Talhao talhao;
 }

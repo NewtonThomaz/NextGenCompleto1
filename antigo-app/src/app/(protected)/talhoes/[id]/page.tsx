@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, use } from 'react'; // Adicionado 'use' aqui
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Plus, Eye, Trash2, Save } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import NewCultureModal from '../../../components/cultura'; 
 
 // Interface para os dados do talhão
 interface TalhaoData {
@@ -23,7 +24,12 @@ interface Collaborator {
   role: string;
 }
 
-export default function TalhaoDetail() {
+// A prop params agora é uma Promise
+export default function TalhaoDetail({ params }: { params: Promise<{ id: string }> }) {
+  // Desembrulhamos os params usando o hook 'use'
+  const { id } = use(params);
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
   
   // --- LISTA DE COLABORADORES ---
@@ -88,14 +94,14 @@ export default function TalhaoDetail() {
     : [];
 
   return (
-    <main className="min-h-[calc(100vh-5rem)] bg-gray-50 flex justify-center py-8 px-4 font-sans">
+    <main className="min-h-[calc(100vh-5rem)] bg-gray-50 flex justify-center py-8 px-4 font-sans relative">
       <section className="w-full max-w-lg md:max-w-5xl space-y-5">
 
         <header className="flex items-center">
           <button
             onClick={() => router.back()}
             aria-label="Voltar"
-            className="text-[#556B2F] hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#556B2F] focus:ring-offset-2"
+            className="text-[#6d8a44] hover:bg-gray-100 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#6d8a44] focus:ring-offset-2"
           >
             <ArrowLeft size={32} strokeWidth={2.5} />
           </button>
@@ -115,7 +121,7 @@ export default function TalhaoDetail() {
                 type="text"
                 value={talhao.nome}
                 onChange={handleChange}
-                className="w-full text-2xl font-bold text-[#556B2F] outline-none bg-transparent border-b-2 border-transparent focus:border-[#556B2F]/20 transition-all placeholder-[#556B2F]/50"
+                className="w-full text-2xl font-bold text-[#6d8a44] outline-none bg-transparent border-b-2 border-transparent focus:border-[#6d8a44]/20 transition-all placeholder-[#6d8a44]/50"
               />
             </section>
 
@@ -130,7 +136,7 @@ export default function TalhaoDetail() {
                 value={talhao.descricao || ''}
                 onChange={handleChange}
                 placeholder="Insira uma descrição (opcional)"
-                className="w-full text-sm text-gray-600 leading-relaxed text-justify outline-none bg-transparent resize-none border-b-2 border-transparent focus:border-[#556B2F]/20 transition-all placeholder:text-gray-300"
+                className="w-full text-sm text-gray-600 leading-relaxed text-justify outline-none bg-transparent resize-none border-b-2 border-transparent focus:border-[#6d8a44]/20 transition-all placeholder:text-gray-300"
               />
             </article>
 
@@ -147,7 +153,7 @@ export default function TalhaoDetail() {
                   step="0.01"
                   value={talhao.tamanho}
                   onChange={handleChange}
-                  className="w-full text-3xl font-bold text-[#556B2F] text-center outline-none bg-transparent p-0 border-b-2 border-transparent focus:border-[#556B2F]/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-full text-3xl font-bold text-[#6d8a44] text-center outline-none bg-transparent p-0 border-b-2 border-transparent focus:border-[#6d8a44]/20 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
                 <span className="h-6 w-full invisible" aria-hidden="true"></span>
               </article>
@@ -156,23 +162,32 @@ export default function TalhaoDetail() {
                 <h3 className="text-xs font-bold text-gray-800 mt-1">Colaboradores</h3>
                 
                 {/* CONTAGEM DINÂMICA BASEADA NO ARRAY */}
-                <span className="text-3xl font-bold text-[#556B2F]">
+                <span className="text-3xl font-bold text-[#6d8a44]">
                   {initialCollaborators.length}
                 </span>
 
                 <a href='/talhoes/[id]/colaboradores'
-                className="flex items-center gap-1 border border-[#7FA050] text-[#556B2F] px-2 py-1 rounded-full text-[10px] font-semibold hover:bg-green-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#556B2F] h-6">
+                className="flex items-center gap-1 border border-[#6d8a44] text-[#6d8a44] px-2 py-1 rounded-full text-[10px] font-semibold hover:bg-green-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#6d8a44] h-6">
                   <Plus size={10} /> adicionar
                 </a>
               </article>
 
-              <article className="bg-white rounded-2xl shadow-md p-3 flex flex-col items-center justify-between aspect-square">
+              {/* --- BOTÃO MODIFICADO AQUI --- */}
+              <button 
+                onClick={() => setIsModalOpen(true)}
+                className="bg-white rounded-2xl shadow-md p-3 flex flex-col items-center justify-between aspect-square hover:bg-gray-50 active:scale-95 transition-all cursor-pointer border border-transparent focus:border-[#6d8a44]"
+                title="Clique para alterar a cultura atual"
+              >
                 <h3 className="text-xs font-bold text-gray-800 mt-1">Cultura Atual</h3>
-                <span className="text-2xl font-bold text-[#556B2F] truncate max-w-full px-1">
+                <span className="text-2xl font-bold text-[#6d8a44] truncate max-w-full px-1">
                   {currentCulture ? currentCulture.name : '-'}
                 </span>
-                <span className="h-6 w-full invisible" aria-hidden="true"></span>
-              </article>
+                {/* Pequeno ícone indicativo visual opcional */}
+                <span className="h-6 w-full flex justify-center items-end text-gray-300">
+                  {/* <span className="text-[10px] font-normal">Alterar</span> */}
+                </span>
+              </button>
+
             </section>
 
             {previousCultures && previousCultures.length > 0 && (
@@ -182,7 +197,7 @@ export default function TalhaoDetail() {
                   {previousCultures.map((culture, index) => (
                     <React.Fragment key={culture.id}>
                       <li className="text-center">
-                        <h3 className="text-2xl font-bold text-[#556B2F]">{culture.name}</h3>
+                        <h3 className="text-2xl font-bold text-[#6d8a44]">{culture.name}</h3>
                       </li>
                       {index < previousCultures.length - 1 && (
                         <li aria-hidden="true" className="w-px h-10 bg-gray-200"></li>
@@ -196,11 +211,11 @@ export default function TalhaoDetail() {
 
           <section className="space-y-5" aria-label="Histórico e Sensores">
 
-            <a href='/talhoes/[id]/operacoes' className="w-full bg-white rounded-xl shadow-md flex items-center overflow-hidden h-14 group active:scale-[0.99] transition-transform focus:outline-none focus:ring-2 focus:ring-[#556B2F] focus:ring-offset-1">
-              <span className="bg-[#7FA050] h-full w-16 flex items-center justify-center group-hover:bg-[#6d8a44] transition-colors">
+            <a href='/talhoes/[id]/operacoes' className="w-full bg-white rounded-xl shadow-md flex items-center overflow-hidden h-14 group active:scale-[0.99] transition-transform focus:outline-none focus:ring-2 focus:ring-[#6d8a44] focus:ring-offset-1">
+              <span className="bg-[#6d8a44] h-full w-16 flex items-center justify-center group-hover:brightness-90 transition-all">
                 <Eye className="text-white" size={28} aria-hidden="true" />
               </span>
-              <span className="flex-1 flex justify-center items-center text-[#556B2F] font-semibold text-sm sm:text-base">
+              <span className="flex-1 flex justify-center items-center text-[#6d8a44] font-semibold text-sm sm:text-base">
                 visualizar historico de operações
               </span>
             </a>
@@ -210,7 +225,7 @@ export default function TalhaoDetail() {
             <section className="bg-white rounded-2xl shadow-md p-5 space-y-4">
               <fieldset className="space-y-2 border-none m-0 p-0">
                 <div className="flex justify-between items-center">
-                  <label htmlFor="temp-sensor" className="text-[#556B2F] text-sm font-bold block">
+                  <label htmlFor="temp-sensor" className="text-[#6d8a44] text-sm font-bold block">
                     Temperatura
                   </label>
                   <div className="flex items-center gap-2">
@@ -222,7 +237,7 @@ export default function TalhaoDetail() {
                         onChange={() => setShowTempGraph(!showTempGraph)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7FA050]"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6d8a44]"></div>
                       <span className="ml-2 text-xs font-medium text-gray-400 select-none">
                         {showTempGraph ? 'ON' : 'OFF'}
                       </span>
@@ -231,11 +246,11 @@ export default function TalhaoDetail() {
                 </div>
 
                 {!showTempGraph && (
-                  <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#556B2F] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
+                  <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#6d8a44] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
                     <span className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent flex items-center " id="temp-sensor">
                       25°C
                     </span>
-                    <button type="button" className="bg-[#7FA050] text-white px-6 font-medium hover:bg-[#6d8a44] transition-colors h-full">
+                    <button type="button" className="bg-[#6d8a44] text-white px-6 font-medium hover:brightness-90 transition-all h-full">
                       Editar
                     </button>
                   </span>
@@ -249,7 +264,7 @@ export default function TalhaoDetail() {
                         <XAxis dataKey="dia" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} domain={['dataMin - 2', 'dataMax + 2']} />
                         <Tooltip contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} labelStyle={{ color: '#374151', fontWeight: 'bold' }} />
-                        <Line type="monotone" dataKey="temperatura" stroke="#556B2F" strokeWidth={3} dot={{ r: 4, fill: '#556B2F', strokeWidth: 0 }} activeDot={{ r: 6, fill: '#7FA050' }} />
+                        <Line type="monotone" dataKey="temperatura" stroke="#6d8a44" strokeWidth={3} dot={{ r: 4, fill: '#6d8a44', strokeWidth: 0 }} activeDot={{ r: 6, fill: '#6d8a44' }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -260,7 +275,7 @@ export default function TalhaoDetail() {
             <section className="bg-white rounded-2xl shadow-md p-5 space-y-4">
               <fieldset className="space-y-2 border-none m-0 p-0">
                 <div className="flex justify-between items-center">
-                  <label htmlFor="humidity-sensor" className="text-[#556B2F] text-sm font-bold block">
+                  <label htmlFor="humidity-sensor" className="text-[#6d8a44] text-sm font-bold block">
                     Umidade
                   </label>
                   <div className="flex items-center gap-2">
@@ -272,7 +287,7 @@ export default function TalhaoDetail() {
                         onChange={() => setShowHumidityGraph(!showHumidityGraph)}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7FA050]"></div>
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#6d8a44]"></div>
                       <span className="ml-2 text-xs font-medium text-gray-400 select-none">
                         {showHumidityGraph ? 'ON' : 'OFF'}
                       </span>
@@ -281,11 +296,11 @@ export default function TalhaoDetail() {
                 </div>
 
                 {!showHumidityGraph && (
-                  <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#556B2F] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
+                  <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#6d8a44] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
                     <span className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent flex items-center " id="humidity-sensor">
                       60%
                     </span>
-                    <button type="button" className="bg-[#7FA050] text-white px-6 font-medium hover:bg-[#6d8a44] transition-colors h-full">
+                    <button type="button" className="bg-[#6d8a44] text-white px-6 font-medium hover:brightness-90 transition-all h-full">
                       Editar
                     </button>
                   </span>
@@ -299,7 +314,7 @@ export default function TalhaoDetail() {
                         <XAxis dataKey="dia" tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} axisLine={false} tickLine={false} domain={[0, 100]} />
                         <Tooltip contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} labelStyle={{ color: '#374151', fontWeight: 'bold' }} />
-                        <Line type="monotone" dataKey="umidade" stroke="#556B2F" strokeWidth={3} dot={{ r: 4, fill: '#556B2F', strokeWidth: 0 }} activeDot={{ r: 6, fill: '#7FA050' }} />
+                        <Line type="monotone" dataKey="umidade" stroke="#6d8a44" strokeWidth={3} dot={{ r: 4, fill: '#6d8a44', strokeWidth: 0 }} activeDot={{ r: 6, fill: '#6d8a44' }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -308,7 +323,7 @@ export default function TalhaoDetail() {
             </section>
 
             <footer className="pt-4 pb-8 flex flex-col sm:flex-row gap-3 md:justify-end">
-              <button className="flex items-center justify-center gap-2 px-8 py-3 rounded-2xl bg-[#7FA050] text-white font-bold text-lg hover:bg-[#6d8a44] active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#556B2F] focus:ring-offset-2 w-full md:w-auto shadow-md">
+              <button className="flex items-center justify-center gap-2 px-8 py-3 rounded-2xl bg-[#6d8a44] text-white font-bold text-lg hover:brightness-90 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#6d8a44] focus:ring-offset-2 w-full md:w-auto shadow-md">
                 Salvar <Save size={24} aria-hidden="true" />
               </button>
               <button className="flex items-center justify-center gap-2 px-8 py-3 rounded-2xl border-2 border-red-500 text-red-500 font-bold text-lg hover:bg-red-50 active:bg-red-100 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 w-full md:w-auto">
@@ -319,6 +334,14 @@ export default function TalhaoDetail() {
           </section>
         </section>
       </section>
+
+      {/* --- RENDERIZAÇÃO DO MODAL --- */}
+      <NewCultureModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        talhaoId={id} 
+      />
+      
     </main>
   );
 }

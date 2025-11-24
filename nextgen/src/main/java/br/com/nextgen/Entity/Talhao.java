@@ -72,12 +72,7 @@ public class Talhao {
     @EqualsAndHashCode.Exclude
     private List<Cultura> culturas;
 
-    @ManyToMany
-    @JoinTable(
-            name = "Talhao_Operacao",
-            joinColumns = @JoinColumn(name = "id_talhao"),
-            inverseJoinColumns = @JoinColumn(name = "id_operacao")
-    )
+    @OneToMany(mappedBy = "talhao", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<Operacao> operacoes;
