@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import { OperacaoDTO, OperacaoRequestDTO } from '../model/types/domain';
+import { OperacaoDTO, OperacaoRequestDTO } from '../model/types/operacao';
 
 export const operacaoService = {
     create: async (payload: OperacaoRequestDTO): Promise<OperacaoDTO> => {

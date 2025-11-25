@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import { CulturaDTO, CulturaRequestDTO } from '../model/types/domain';
+import { CulturaDTO, CulturaRequestDTO } from '../model/types/cultura';
 
 export const culturaService = {
     // Busca todas (se precisar filtrar no front)

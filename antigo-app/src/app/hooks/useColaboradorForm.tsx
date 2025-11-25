@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { colaboradorService } from '../services/colaboradorService';
-import { Permissao } from '../model/types/domain';
+import { Permissao } from '../model/types/enum';
 
 export function useColaboradorForm(talhaoId: string, onSuccess: () => void) {
     const [loading, setLoading] = useState(false);

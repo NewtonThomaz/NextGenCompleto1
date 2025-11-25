@@ -1,7 +1,6 @@
 import api from '../lib/api';
 // Importe os DTOs corretos (ajuste o caminho se necessário)
-import { TalhaoRequestDTO, TalhaoResponseDTO } from '../model/types/talhao';
-import { TalhaoDetalhadoDTO } from '../model/types/domain';
+import { TalhaoRequestDTO, TalhaoResponseDTO, TalhaoDetalhadoDTO } from '../model/types/talhao';
 
 export const talhaoService = {
     getAll: async (): Promise<TalhaoResponseDTO[]> => {

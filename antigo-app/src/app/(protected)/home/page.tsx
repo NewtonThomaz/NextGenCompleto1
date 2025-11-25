@@ -12,7 +12,7 @@ import { Plus, ArrowLeft, Loader2, ChevronDown } from 'lucide-react';
 import { carrossel } from "../../model/data/carrossel";
 import { useAuth } from '../../hooks/useAuth';
 import { useTalhoes } from '../../hooks/useTalhoes';
-import { Medida } from '../../model/types/talhao';
+import { Medida } from '../../model/types/enum';
 
 export default function Home() {
     const { user } = useAuth();

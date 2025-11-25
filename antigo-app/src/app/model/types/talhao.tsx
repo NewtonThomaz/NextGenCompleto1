@@ -1,9 +1,9 @@
 // Enum igual ao do Java
-export enum Medida {
-    HECTARE = 'HECTARE',
-    QUILOMETROS_QUADRADOS = 'QUILOMETROS_QUADRADOS',
-    METROS_QUADRADOS = 'METROS_QUADRADOS'
-}
+import { Medida } from './enum'
+import { CulturaDTO } from './cultura'
+import { OperacaoDTO } from './operacao'
+import { ColaboradorDTO } from './colaborador'
+import { SensorDTO } from './sensor'
 
 export interface TalhaoRequestDTO {
     nome: string;
@@ -26,4 +26,18 @@ export interface TalhaoResponseDTO {
     nomesCulturas: string[];
     descricoesOperacoes: string[];
     ativo: boolean;
+}
+
+export interface TalhaoDetalhadoDTO {
+    id: string;
+    nome: string;
+    descricao: string;
+    tamanho: number;
+    medida: Medida;
+    ativo: boolean;
+    culturas: CulturaDTO[];
+    operacoes: OperacaoDTO[];
+    colaboradores: ColaboradorDTO[];
+    sensorTemperatura?: SensorDTO;
+    sensorUmidade?: SensorDTO;
 }

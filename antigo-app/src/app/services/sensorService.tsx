@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import { SensorDTO, SensorRequestDTO } from '../model/types/domain';
+import { SensorDTO, SensorRequestDTO } from '../model/types/sensor';
 
 export const sensorService = {
     // Como temos controllers separados para Temp e Umidade, o service decide qual chamar

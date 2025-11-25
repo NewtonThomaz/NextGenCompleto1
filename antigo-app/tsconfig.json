@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-, "src/app/(protected)/configuracoes/page.tsx"  ],
+, "src/app/(protected)/configuracoes/page.tsx", "src/app/model/types/domain"  ],
   "exclude": ["node_modules"]
 }
