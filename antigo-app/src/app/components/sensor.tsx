@@ -3,30 +3,35 @@
 import { useState } from 'react';
 import { ArrowLeft, ChevronDown, Plus } from 'lucide-react';
 
-interface NewCultureModalProps {
+interface SensorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  talhaoId: string;
+  type: 'temperatura' | 'umidade' | null;
 }
 
-export default function NewCultureModal({ isOpen, onClose, talhaoId }: NewCultureModalProps) {
+export default function SensorModal({ isOpen, onClose, type }: SensorModalProps) {
   const [viewState, setViewState] = useState<'select' | 'create'>('select');
-  const [selectedCulture, setSelectedCulture] = useState('');
+  const [selectedSensor, setSelectedSensor] = useState('');
+  
+  // Inputs separados APENAS para o formulário visual
+  const [newSensorIp, setNewSensorIp] = useState('');
+  const [newSensorName, setNewSensorName] = useState('');
 
-  // --- LISTA DE OBJETOS INSTANCIADA ---
-  const cultureOptions = [
-    { id: 'milho', name: 'Milho' },
-    { id: 'soja', name: 'Soja' },
-    { id: 'trigo', name: 'Trigo' },
-    { id: 'cafe', name: 'Café' },
-    { id: 'algodao', name: 'Algodão' },
-    { id: 'feijao', name: 'Feijão' },
-  ];
+  // LISTA DE OBJETOS: Agora reflete o backend com UM CAMPO ÚNICO ('info')
+  const [sensors, setSensors] = useState([
+    { id: '1', info: 'Sensor A - 192.168.0.1' },
+    { id: '2', info: 'Sensor B - 192.168.0.2' },
+    { id: '3', info: 'Sensor C - 192.168.0.50' },
+    { id: '4', info: 'Sensor Galpão - 192.168.0.101' },
+    { id: '5', info: 'Sensor Externo - 192.168.0.102' },
+  ]);
 
   if (!isOpen) return null;
 
   const handleClose = () => {
     setViewState('select');
+    setNewSensorIp('');
+    setNewSensorName('');
     onClose();
   };
 
@@ -35,6 +40,29 @@ export default function NewCultureModal({ isOpen, onClose, talhaoId }: NewCultur
       handleClose();
     }
   };
+
+  const handleRegister = () => {
+    if (!newSensorIp || !newSensorName) return; 
+
+    // LÓGICA DE UNIFICAÇÃO:
+    // Pega os dois inputs visuais e salva em um único campo no objeto
+    const infoUnificada = `${newSensorName} - ${newSensorIp}`;
+
+    const newSensorObj = {
+      id: Date.now().toString(),
+      info: infoUnificada // Campo único que vai pro backend/lista
+    };
+
+    setSensors([...sensors, newSensorObj]);
+    setSelectedSensor(newSensorObj.id);
+
+    // Limpa inputs
+    setNewSensorIp('');
+    setNewSensorName('');
+    setViewState('select');
+  };
+
+  const title = type === 'temperatura' ? 'Sensor de Temperatura' : 'Sensor de Umidade';
 
   return (
     <div 
@@ -52,23 +80,27 @@ export default function NewCultureModal({ isOpen, onClose, talhaoId }: NewCultur
           </button>
           
           <h2 className="text-2xl font-bold text-[#6d8a44]">
-            {viewState === 'select' ? 'Iniciar Novo Cultivo' : 'Criando nova cultura'}
+            {viewState === 'select' ? 'Adicionando Sensor' : 'Novo Sensor'}
           </h2>
         </div>
 
         {viewState === 'select' && (
           <div className="space-y-6">
+            <p className="text-gray-500 text-sm -mt-6 mb-4 ml-12">
+              Configurando {title}
+            </p>
+
             <div className="relative">
-              {/* --- USO DA LISTA NO SELECT --- */}
               <select 
                 className="w-full appearance-none border border-gray-300 rounded-full py-3 px-4 text-gray-700 focus:outline-none focus:border-[#6d8a44] focus:ring-1 focus:ring-[#6d8a44] bg-white cursor-pointer shadow-sm"
-                value={selectedCulture}
-                onChange={(e) => setSelectedCulture(e.target.value)}
+                value={selectedSensor}
+                onChange={(e) => setSelectedSensor(e.target.value)}
               >
-                <option value="" disabled>Nome da cultura</option>
-                {cultureOptions.map((culture) => (
-                  <option key={culture.id} value={culture.id}>
-                    {culture.name}
+                <option value="" disabled>Selecione o sensor</option>
+                {/* Exibe o campo único 'info' */}
+                {sensors.map((sensor) => (
+                  <option key={sensor.id} value={sensor.id}>
+                    {sensor.info}
                   </option>
                 ))}
               </select>
@@ -82,7 +114,7 @@ export default function NewCultureModal({ isOpen, onClose, talhaoId }: NewCultur
               <div className="bg-[#6d8a44] text-white rounded-full p-0.5 group-hover:brightness-90 transition-all">
                 <Plus size={14} />
               </div>
-              Registrar uma nova cultura
+              Registrar novo sensor
             </button>
 
             <div className="flex gap-3 mt-8">
@@ -93,6 +125,7 @@ export default function NewCultureModal({ isOpen, onClose, talhaoId }: NewCultur
                 Cancelar
               </button>
               <button 
+                onClick={handleClose} 
                 className="flex-1 bg-[#6d8a44] text-white font-bold py-3 rounded-full hover:brightness-90 transition shadow-md focus:ring-2 focus:ring-[#6d8a44] focus:ring-offset-1"
               >
                 Salvar
@@ -101,13 +134,27 @@ export default function NewCultureModal({ isOpen, onClose, talhaoId }: NewCultur
           </div>
         )}
 
+        {/* Formulário visual com campos SEPARADOS */}
         {viewState === 'create' && (
-          <div className="space-y-6 animate-in slide-in-from-right-4 duration-200">
+          <div className="space-y-4 animate-in slide-in-from-right-4 duration-200">
             <div>
+              <label className="block text-sm font-medium text-gray-700 ml-2 mb-1">Endereço IP</label>
               <input 
                 type="text" 
-                autoFocus
-                placeholder="Nome da cultura"
+                placeholder="Ex: 192.168.0.100"
+                value={newSensorIp}
+                onChange={(e) => setNewSensorIp(e.target.value)}
+                className="w-full border border-gray-300 rounded-full py-3 px-4 text-gray-700 focus:outline-none focus:border-[#6d8a44] focus:ring-1 focus:ring-[#6d8a44] shadow-sm"
+              />
+            </div>
+            
+            <div>
+               <label className="block text-sm font-medium text-gray-700 ml-2 mb-1">Identificação</label>
+               <input 
+                type="text" 
+                placeholder="Ex: Sensor Galpão 1"
+                value={newSensorName}
+                onChange={(e) => setNewSensorName(e.target.value)}
                 className="w-full border border-gray-300 rounded-full py-3 px-4 text-gray-700 focus:outline-none focus:border-[#6d8a44] focus:ring-1 focus:ring-[#6d8a44] shadow-sm"
               />
             </div>
@@ -120,6 +167,7 @@ export default function NewCultureModal({ isOpen, onClose, talhaoId }: NewCultur
                 Cancelar
               </button>
               <button 
+                onClick={handleRegister}
                 className="flex-1 bg-[#6d8a44] text-white font-bold py-3 rounded-full hover:brightness-90 transition shadow-md focus:ring-2 focus:ring-[#6d8a44] focus:ring-offset-1"
               >
                 Registrar

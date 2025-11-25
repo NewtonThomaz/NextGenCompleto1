@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, use } from 'react'; // Adicionado 'use' aqui
+import React, { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Plus, Eye, Trash2, Save } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import NewCultureModal from '../../../components/cultura'; 
+// Importe o novo modal
+import SensorModal from '../../../components/sensor';
 
 // Interface para os dados do talhão
 interface TalhaoData {
@@ -24,12 +26,23 @@ interface Collaborator {
   role: string;
 }
 
-// A prop params agora é uma Promise
+// Interfaces para Sensores e Gráficos
+interface SensorData {
+  id: string;
+  ip: string;
+}
+
 export default function TalhaoDetail({ params }: { params: Promise<{ id: string }> }) {
-  // Desembrulhamos os params usando o hook 'use'
   const { id } = use(params);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // --- NOVO ESTADO PARA O MODAL DE SENSORES ---
+  const [sensorModalState, setSensorModalState] = useState<{
+    isOpen: boolean;
+    type: 'temperatura' | 'umidade' | null;
+  }>({ isOpen: false, type: null });
+
   const router = useRouter();
   
   // --- LISTA DE COLABORADORES ---
@@ -62,25 +75,43 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
   const [showTempGraph, setShowTempGraph] = useState(true);
   const [showHumidityGraph, setShowHumidityGraph] = useState(true);
 
+  // --- DADOS DOS SENSORES E GRÁFICOS ---
+  const temperatura: SensorData[] = [
+    { id: '1', ip: '192.168.0.1' }
+  ];
+
   const tempGraphic = [
-    { dia: '12', temperatura: 25 },
-    { dia: '13', temperatura: 22 },
-    { dia: '14', temperatura: 28 },
-    { dia: '15', temperatura: 26 },
-    { dia: '16', temperatura: 30 },
-    { dia: '17', temperatura: 24 },
-    { dia: '18', temperatura: 27 },
+    { dia: '12', temperatura: 25, id_temperatura: '1' },
+    { dia: '13', temperatura: 22, id_temperatura: '1' },
+    { dia: '14', temperatura: 28, id_temperatura: '1' },
+    { dia: '15', temperatura: 26, id_temperatura: '1' },
+    { dia: '16', temperatura: 30, id_temperatura: '1' },
+    { dia: '17', temperatura: 24, id_temperatura: '1' },
+    { dia: '18', temperatura: 27, id_temperatura: '1' },
+  ];
+
+  const umidade: SensorData[] = [
+    { id: '1', ip: '192.168.0.2' }
   ];
 
   const humidityGraphic = [
-    { dia: '12', umidade: 60 },
-    { dia: '13', umidade: 55 },
-    { dia: '14', umidade: 65 },
-    { dia: '15', umidade: 62 },
-    { dia: '16', umidade: 70 },
-    { dia: '17', umidade: 58 },
-    { dia: '18', umidade: 63 },
+    { dia: '12', umidade: 60, id_umidade: '1' },
+    { dia: '13', umidade: 55, id_umidade: '1' },
+    { dia: '14', umidade: 65, id_umidade: '1' },
+    { dia: '15', umidade: 62, id_umidade: '1' },
+    { dia: '16', umidade: 70, id_umidade: '1' },
+    { dia: '17', umidade: 58, id_umidade: '1' },
+    { dia: '18', umidade: 63, id_umidade: '1' },
   ];
+
+  const currentTempSensorId = tempGraphic[tempGraphic.length - 1]?.id_temperatura;
+  const currentTempSensor = temperatura.find(sensor => sensor.id === currentTempSensorId);
+  const tempDisplay = currentTempSensor ? `IP: ${currentTempSensor.ip}` : '--';
+
+  const currentHumiditySensorId = humidityGraphic[humidityGraphic.length - 1]?.id_umidade;
+  const currentHumiditySensor = umidade.find(sensor => sensor.id === currentHumiditySensorId);
+  const humidityDisplay = currentHumiditySensor ? `IP: ${currentHumiditySensor.ip}` : '--';
+
 
   const fullHistory = [
     { id: '1', name: 'Soja' },
@@ -92,6 +123,11 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
   const previousCultures = currentCulture
     ? fullHistory.filter(item => item.id !== currentCulture.id)
     : [];
+
+  // Função auxiliar para abrir modal de sensor
+  const openSensorModal = (type: 'temperatura' | 'umidade') => {
+    setSensorModalState({ isOpen: true, type });
+  };
 
   return (
     <main className="min-h-[calc(100vh-5rem)] bg-gray-50 flex justify-center py-8 px-4 font-sans relative">
@@ -182,9 +218,8 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
                 <span className="text-2xl font-bold text-[#6d8a44] truncate max-w-full px-1">
                   {currentCulture ? currentCulture.name : '-'}
                 </span>
-                {/* Pequeno ícone indicativo visual opcional */}
                 <span className="h-6 w-full flex justify-center items-end text-gray-300">
-                  {/* <span className="text-[10px] font-normal">Alterar</span> */}
+                  <span className="text-[10px] font-normal">Alterar</span>
                 </span>
               </button>
 
@@ -222,6 +257,7 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
 
             <h2 className="text-lg font-bold text-black">Sensores</h2>
 
+            {/* --- SEÇÃO TEMPERATURA --- */}
             <section className="bg-white rounded-2xl shadow-md p-5 space-y-4">
               <fieldset className="space-y-2 border-none m-0 p-0">
                 <div className="flex justify-between items-center">
@@ -248,9 +284,14 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
                 {!showTempGraph && (
                   <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#6d8a44] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
                     <span className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent flex items-center " id="temp-sensor">
-                      25°C
+                      {tempDisplay}
                     </span>
-                    <button type="button" className="bg-[#6d8a44] text-white px-6 font-medium hover:brightness-90 transition-all h-full">
+                    {/* BOTÃO EDITAR TEMPERATURA */}
+                    <button 
+                      type="button" 
+                      onClick={() => openSensorModal('temperatura')}
+                      className="bg-[#6d8a44] text-white px-6 font-medium hover:brightness-90 transition-all h-full"
+                    >
                       Editar
                     </button>
                   </span>
@@ -272,6 +313,7 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
               </fieldset>
             </section>
 
+            {/* --- SEÇÃO UMIDADE --- */}
             <section className="bg-white rounded-2xl shadow-md p-5 space-y-4">
               <fieldset className="space-y-2 border-none m-0 p-0">
                 <div className="flex justify-between items-center">
@@ -298,9 +340,14 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
                 {!showHumidityGraph && (
                   <span className="flex rounded-lg shadow-sm border border-gray-200 overflow-hidden h-12 focus-within:ring-2 focus-within:ring-[#6d8a44] focus-within:border-transparent animate-in fade-in zoom-in-95 duration-200">
                     <span className="flex-1 px-4 text-gray-600 outline-none w-full h-full bg-transparent flex items-center " id="humidity-sensor">
-                      60%
+                      {humidityDisplay}
                     </span>
-                    <button type="button" className="bg-[#6d8a44] text-white px-6 font-medium hover:brightness-90 transition-all h-full">
+                    {/* BOTÃO EDITAR UMIDADE */}
+                    <button 
+                      type="button" 
+                      onClick={() => openSensorModal('umidade')}
+                      className="bg-[#6d8a44] text-white px-6 font-medium hover:brightness-90 transition-all h-full"
+                    >
                       Editar
                     </button>
                   </span>
@@ -335,11 +382,18 @@ export default function TalhaoDetail({ params }: { params: Promise<{ id: string 
         </section>
       </section>
 
-      {/* --- RENDERIZAÇÃO DO MODAL --- */}
+      {/* --- MODAL DE CULTURA (JÁ EXISTENTE) --- */}
       <NewCultureModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         talhaoId={id} 
+      />
+
+      {/* --- NOVO MODAL DE SENSORES --- */}
+      <SensorModal
+        isOpen={sensorModalState.isOpen}
+        type={sensorModalState.type}
+        onClose={() => setSensorModalState({ ...sensorModalState, isOpen: false })}
       />
       
     </main>
